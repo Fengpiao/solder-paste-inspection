@@ -143,48 +143,54 @@ wq 保存退出。
     166.111.7.245  
     166.111.7.246  
 
-编辑spark-defaults.conf
-$ cp conf/spark-defaults.conf.template conf/spark-defaults.conf
-$ vim conf/spark-defaults.conf
-在末尾添加上
-spark.cassandra.connection.host    166.111.7.244,166.111.7.245,166.111.7.246
+编辑spark-defaults.conf  
 
-发给两外两台机器
-$ scp -r spark cst@166.111.7.245:/home/cst/src/
-$ scp -r spark cst@166.111.7.246:/home/cst/src/
+    $ cp conf/spark-defaults.conf.template conf/spark-defaults.conf  
+    $ vim conf/spark-defaults.conf  
+    
+在末尾添加上  
 
-启动spark集群,主节点执行
-$ sbin/start-all.sh
+    spark.cassandra.connection.host    166.111.7.244,166.111.7.245,166.111.7.246  
 
-主节点进入spark shell
-$ bin/spark-shell --jars /home/cst/src/spark-cassandra-connector.jar
-(spark-cassandra-connector.jar是已经提前编译好的，如果cassandra和spark的版本号改变了, spark-cassandra-connector.jar 需要另行编译。)
-scala> sc.stop
-scala> import com.datastax.spark.connector._, org.apache.spark.SparkContext, org.apache.spark.SparkContext._, org.apache.spark.SparkConf
-scala> val conf = new SparkConf(true).set("spark.cassandra.connection.host", "166.111.7.244")
-scala> val sc = new SparkContext(conf)
-scala> var rdd = sc.cassandraTable("rocket","rocket_temp")
-scala> rdd.first
+scp给两外两台机器  
 
-启动thriftserver
-$ sbin/start-thriftserver.sh --hiveconf hive.server2.thrift.bind.host 166.111.7.244 --hiveconf hive.server2.thrift.port 10000 --jars /home/cst/src/spark-cassandra-connector.jar --driver-class-path /home/cst/src/spark-cassandra-connector.jar
-$ ./bin/beeline
-beeline> !connect jdbc:hive2://166.111.7.244:10000
-Connecting to jdbc:hive2://166.111.7.244:10000
-Enter username for jdbc:hive2://166.111.7.244:10000: cassandra
-Enter password for jdbc:hive2://166.111.7.244:10000: *********
-log4j:WARN No appenders could be found for logger (org.apache.hive.jdbc.Utils).
-log4j:WARN Please initialize the log4j system properly.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
-Connected to: Spark SQL (version 2.0.0)
-Driver: Hive JDBC (version 1.2.1.spark2)
-Transaction isolation: TRANSACTION_REPEATABLE_READ
+    $ scp -r spark cst@166.111.7.245:/home/cst/src/  
+    $ scp -r spark cst@166.111.7.246:/home/cst/src/  
 
-jdbc:hive2://166.111.7.244:10000> create database mykeyspace;
-jdbc:hive2://166.111.7.244:10000> use mykeyspace;
-jdbc:hive2://166.111.7.244:10000> CREATE TABLE rocket_table USING org.apache.spark.sql.cassandra OPTIONS (cluster 'Test Cluster', keyspace 'mykeyspace', table 'rocket_table');
-jdbc:hive2://166.111.7.244:10000> select * from rocket_table;
+启动spark集群,主节点执行  
 
+    $ sbin/start-all.sh  
+
+主节点进入spark shell  
+
+    $ bin/spark-shell --jars /home/cst/src/spark-cassandra-connector.jar  
+    (spark-cassandra-connector.jar是已经提前编译好的，如果cassandra和spark的版本号改变了, spark-cassandra-connector.jar 需要另行编译。)  
+    scala> sc.stop  
+    scala> import com.datastax.spark.connector._, org.apache.spark.SparkContext, org.apache.spark.SparkContext._, org.apache.spark.SparkConf  
+    scala> val conf = new SparkConf(true).set("spark.cassandra.connection.host", "166.111.7.244")  
+    scala> val sc = new SparkContext(conf)  
+    scala> var rdd = sc.cassandraTable("rocket","rocket_temp")  
+    scala> rdd.first  
+
+启动thriftserver 
+
+    $ sbin/start-thriftserver.sh --hiveconf hive.server2.thrift.bind.host 166.111.7.244 --hiveconf hive.server2.thrift.port 10000 --jars /home/cst/src/spark-cassandra-connector.jar --driver-class-path /home/cst/src/spark-cassandra-connector.jar  
+    $ ./bin/beeline  
+    beeline> !connect jdbc:hive2://166.111.7.244:10000  
+    Connecting to jdbc:hive2://166.111.7.244:10000  
+    Enter username for jdbc:hive2://166.111.7.244:10000: cassandra  
+    Enter password for jdbc:hive2://166.111.7.244:10000: *********  
+    log4j:WARN No appenders could be found for logger (org.apache.hive.jdbc.Utils).  
+    log4j:WARN Please initialize the log4j system properly.  
+    log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.  
+    Connected to: Spark SQL (version 2.0.0)  
+    Driver: Hive JDBC (version 1.2.1.spark2)  
+    Transaction isolation: TRANSACTION_REPEATABLE_READ  
+
+    jdbc:hive2://166.111.7.244:10000> create database mykeyspace;  
+    jdbc:hive2://166.111.7.244:10000> use mykeyspace;  
+    jdbc:hive2://166.111.7.244:10000> CREATE TABLE rocket_table USING org.apache.spark.sql.cassandra OPTIONS (cluster 'Test Cluster', keyspace  'mykeyspace', table 'rocket_table');  
+    jdbc:hive2://166.111.7.244:10000> select * from rocket_table;  
 
 SQL server 通过ODBC连接cassandra+spark集群。
 参照 http://wiki.servicenow.com/index.php?title=Using_ODBC_Driver_in_SQL_Server#gsc.tab=0
