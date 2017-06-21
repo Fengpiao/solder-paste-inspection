@@ -79,6 +79,7 @@ Cassandra Thrift 客户端（应用程序）访问的IP地址：rpc_address: 166
     $ /bin/cassandra -f  
 
 等待输出日志，另外一台机子执行相同的操作时会看到前面的电脑上输出如下信息：
+![cassandra log](https://github.com/Fengpiao/solder-paste-inspection/blob/master/images/log.png)
 
 进入交互式  
 
@@ -88,44 +89,59 @@ Cassandra Thrift 客户端（应用程序）访问的IP地址：rpc_address: 166
     cqlsh:rocket> create table rocket_temp(RN int,SAMPLE varchar,TIMES float,P float,T1 float,T2 float,U float,Z1 float,Z2 float,K1 int,K2 int,PRIMARY kEY(RN,SAMPLE,TIMES));  
     cqlsh:rocket> COPY rocket_temp(RN,SAMPLE,TIMES,P,T1,T2,U,Z1,Z2,K1,K2) FROM '/home/cst/src/rocket_10samples_temp.csv' with delimiter =',' and header =TRUE;  
 
-# 安装scala
-$ tar -zxvf  scala-2.11.8.tgz
-$ mv scala-2.11.8.tgz scala
-编辑bashrc文件添加以下内容
-# setting scala
-export SCALA_HOME=/home/cst/src/scala
-export PATH=$SCALA_HOME/bin:$PATH
-wq 保存退出
- # source ~/.bashrc 更新。
+### 安装scala
+
+    $ tar -zxvf  scala-2.11.8.tgz  
+    $ mv scala-2.11.8.tgz scala  
+    
+编辑bashrc文件添加以下内容  
+
+    # setting scala  
+    export SCALA_HOME=/home/cst/src/scala  
+    export PATH=$SCALA_HOME/bin:$PATH  
+    
+wq 保存退出。  
+
+    # source ~/.bashrc  
+ 
 其余两台机子上执行相同操作
 
-# spark集群配置
-安装spark 
-$ tar -zxvf  spark-2.0.0-bin-hadoop2.7.tgz
-$ mv spark-2.0.0-bin-hadoop2.7.tgz spark
+### spark集群配置  
+安装spark  
 
-编辑bashrc文件添加以下内容
-# setting spark
-export SPARK_HOME=/home/cst/src/spark
-export PATH=$SPARK_HOME/bin:$PATH
-wq 保存退出
- # source ~/.bashrc 更新。
-其余两台机子上执行相同操作
+    $ tar -zxvf  spark-2.0.0-bin-hadoop2.7.tgz  
+    $ mv spark-2.0.0-bin-hadoop2.7.tgz spark  
 
-编辑spark-env.sh文件
-$ cp conf/spark-env.sh.template conf/spark-env.sh
-$ vim conf/spark-env.sh
-在底部加上
-export JAVA_HOME=/home/cst/src/java
-export SCALA_HOME=/home/cst/src/scala
-export SPARK_MASTER_IP=166.111.7.244
+编辑bashrc文件添加以下内容  
 
-修改配置文件slaves，加上所有的work节点
-$ cp conf/slaves.template conf/slaves
-$ vim conf/slaves
-# A Spark Worker will be started on each of the machines listed below.
-166.111.7.245
-166.111.7.246
+    # setting spark  
+    export SPARK_HOME=/home/cst/src/spark  
+    export PATH=$SPARK_HOME/bin:$PATH  
+    
+wq 保存退出。  
+
+    # source ~/.bashrc  
+ 
+其余两台机子上执行相同操作。  
+
+编辑spark-env.sh文件  
+
+    $ cp conf/spark-env.sh.template conf/spark-env.sh  
+    $ vim conf/spark-env.sh  
+
+在底部加上  
+
+    export JAVA_HOME=/home/cst/src/java  
+    export SCALA_HOME=/home/cst/src/scala  
+    export SPARK_MASTER_IP=166.111.7.244  
+
+修改配置文件slaves，加上所有的work节点  
+
+    $ cp conf/slaves.template conf/slaves  
+    $ vim conf/slaves  
+    # A Spark Worker will be started on each of the machines listed below.
+    166.111.7.245  
+    166.111.7.246  
 
 编辑spark-defaults.conf
 $ cp conf/spark-defaults.conf.template conf/spark-defaults.conf
