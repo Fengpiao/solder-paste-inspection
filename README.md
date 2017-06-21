@@ -1,7 +1,7 @@
 # README
 某主板生产商锡膏印刷主板及上面一万多个焊点的数据信息,全年结构化数据42亿行。在单机上无法直接进行数据分析，为此需要搭建一个spark集群进行数据清洗和预处理。
 
-1. 安装环境
+# 安装环境
 三节点 [166.111.7.244，166.111.7.245，166.111.7.246]
 Ubuntu 14.04.4
 JDK8
@@ -10,7 +10,7 @@ spark 2.0.0
 scala 2.11.8
 tableau 10
 
-2. SSH免密匙登陆
+# SSH免密匙登陆
 $ ssh-keygen -t rsa
 一路回车直至结束, 默认情况下会在~/.ssh文件夹下生成两个文件,id_rsa和id_rsa.pub, 将id_rsa.pub输出到authorized_keys文件中
 $ cd ~/.ssh
@@ -31,7 +31,7 @@ cst@s1:~/.ssh$ scp authorized_keys cst@166.111.7.246:~/.ssh/authorized_keys
 $ chmod 600 authorized_keys
 在任何一台机器上使用ssh 免密码登陆，则说明配置成功
 
-3. 安装JDK
+# 安装JDK
 $ cd /home/cst/src
 $ tar -zxvf  jdk-8u111-linux-x64.gz
 $ mv jdk-8u111-linux-x64.gz java
@@ -44,7 +44,7 @@ wq 保存退出
  # source ~/.bashrc 更新。
 其余两台机子上执行相同操作
 
-4. cassandra 分布式部署
+# cassandra 分布式部署
 安装cassandra
 $ tar -zxvf  apache-cassandra-3.0.10-bin.tar.gz
 $ mv apache-cassandra-3.0.10-bin.tar.gz cassandra
@@ -77,7 +77,7 @@ float,T1 float,T2 float,U float,Z1 float,Z2 float,K1 int,K2 int,PRIMARY kEY(RN,S
 cqlsh:rocket> COPY rocket_temp(RN,SAMPLE,TIMES,P,T1,T2,U,Z1,Z2,K1,K2) FROM '/home/cst/src/rocket_10samples_temp.csv' with delimiter =',' and header =TRUE;
 
 
-5.安装scala
+# 安装scala
 $ tar -zxvf  scala-2.11.8.tgz
 $ mv scala-2.11.8.tgz scala
 编辑bashrc文件添加以下内容
@@ -88,7 +88,7 @@ wq 保存退出
  # source ~/.bashrc 更新。
 其余两台机子上执行相同操作
 
-6.spark集群配置
+# spark集群配置
 安装spark 
 $ tar -zxvf  spark-2.0.0-bin-hadoop2.7.tgz
 $ mv spark-2.0.0-bin-hadoop2.7.tgz spark
