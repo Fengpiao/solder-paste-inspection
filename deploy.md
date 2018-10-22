@@ -1,5 +1,5 @@
 ### 安装环境
-    三节点 [166.111.7.244，166.111.7.245，166.111.7.246]
+    三节点 [166.***.*.244，166.***.*.245，166.***.*.246]
     Ubuntu 14.04.4
     JDK8
     cassandra 3.0.1 
@@ -26,8 +26,8 @@
 
 将authorized_keys发送到每台机器  
 
-    cst@s1:~/.ssh$ scp authorized_keys cst@166.111.7.245:~/.ssh/authorized_keys  
-    cst@s1:~/.ssh$ scp authorized_keys cst@166.111.7.246:~/.ssh/authorized_keys
+    cst@s1:~/.ssh$ scp authorized_keys cst@166.***.*.245:~/.ssh/authorized_keys  
+    cst@s1:~/.ssh$ scp authorized_keys cst@166.***.*.246:~/.ssh/authorized_keys
 
 将authorized_keys文件的权限改为600，每台机子上操作：  
 
@@ -68,10 +68,10 @@ wq 保存退出
     $ sudo chown -R cst /var/lib/cassandra  
 
 修改cassandra.yaml文件，把对应的IP地址改掉。  
-第一台作为种子节点 -seeds: "166.111.7.244"   
-然后配置节点之前通信的IP地址：listen_address: 166.111.7.244  
-Cassandra Thrift 客户端（应用程序）访问的IP地址：rpc_address: 166.111.7.244  
-另外的两台机子上执行相同的操作，cassandra.yaml文件：seeds: "166.111.7.244" 不变，listen_address 和 rpc_address 为实际机器的IP地址。  
+第一台作为种子节点 -seeds: "166.***.*.244"   
+然后配置节点之前通信的IP地址：listen_address: 166.***.*.244  
+Cassandra Thrift 客户端（应用程序）访问的IP地址：rpc_address: 166.***.*.244  
+另外的两台机子上执行相同的操作，cassandra.yaml文件：seeds: "166.***.*.244" 不变，listen_address 和 rpc_address 为实际机器的IP地址。  
 
 启动集群  
 先启动种子节点，后启动另外两个节点  
@@ -83,7 +83,7 @@ Cassandra Thrift 客户端（应用程序）访问的IP地址：rpc_address: 166
 
 进入交互式  
 
-    $ bin/cqlsh 166.111.7.244  
+    $ bin/cqlsh 166.***.*.244  
     cqlsh> create keyspace rocket with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 3};  
     cqlsh> USE rocket;  
     cqlsh:rocket> create table rocket_temp(RN int,SAMPLE varchar,TIMES float,P float,T1 float,T2 float,U float,Z1 float,Z2 float,K1 int,K2 int,PRIMARY kEY(RN,SAMPLE,TIMES));  
@@ -133,15 +133,15 @@ wq 保存退出。
 
     export JAVA_HOME=/home/cst/src/java  
     export SCALA_HOME=/home/cst/src/scala  
-    export SPARK_MASTER_IP=166.111.7.244  
+    export SPARK_MASTER_IP=166.***.*.244  
 
 修改配置文件slaves，加上所有的work节点  
 
     $ cp conf/slaves.template conf/slaves  
     $ vim conf/slaves  
     # A Spark Worker will be started on each of the machines listed below.
-    166.111.7.245  
-    166.111.7.246  
+    166.***.*.245  
+    166.***.*.246  
 
 编辑spark-defaults.conf  
 
@@ -150,12 +150,12 @@ wq 保存退出。
     
 在末尾添加上  
 
-    spark.cassandra.connection.host    166.111.7.244,166.111.7.245,166.111.7.246  
+    spark.cassandra.connection.host    166.***.*.244,166.***.*.245,166.***.*.246  
 
 scp给两外两台机器  
 
-    $ scp -r spark cst@166.111.7.245:/home/cst/src/  
-    $ scp -r spark cst@166.111.7.246:/home/cst/src/  
+    $ scp -r spark cst@166.***.*.245:/home/cst/src/  
+    $ scp -r spark cst@166.***.*.246:/home/cst/src/  
 
 启动spark集群,主节点执行  
 
@@ -167,19 +167,19 @@ scp给两外两台机器
     (spark-cassandra-connector.jar是已经提前编译好的，如果cassandra和spark的版本号改变了, spark-cassandra-connector.jar 需要另行编译。)  
     scala> sc.stop  
     scala> import com.datastax.spark.connector._, org.apache.spark.SparkContext, org.apache.spark.SparkContext._, org.apache.spark.SparkConf  
-    scala> val conf = new SparkConf(true).set("spark.cassandra.connection.host", "166.111.7.244")  
+    scala> val conf = new SparkConf(true).set("spark.cassandra.connection.host", "166.***.*.244")  
     scala> val sc = new SparkContext(conf)  
     scala> var rdd = sc.cassandraTable("rocket","rocket_temp")  
     scala> rdd.first  
 
 启动thriftserver 
 
-    $ sbin/start-thriftserver.sh --hiveconf hive.server2.thrift.bind.host 166.111.7.244 --hiveconf hive.server2.thrift.port 10000 --jars /home/cst/src/spark-cassandra-connector.jar --driver-class-path /home/cst/src/spark-cassandra-connector.jar  
+    $ sbin/start-thriftserver.sh --hiveconf hive.server2.thrift.bind.host 166.***.*.244 --hiveconf hive.server2.thrift.port 10000 --jars /home/cst/src/spark-cassandra-connector.jar --driver-class-path /home/cst/src/spark-cassandra-connector.jar  
     $ ./bin/beeline  
-    beeline> !connect jdbc:hive2://166.111.7.244:10000  
-    Connecting to jdbc:hive2://166.111.7.244:10000  
-    Enter username for jdbc:hive2://166.111.7.244:10000: cassandra  
-    Enter password for jdbc:hive2://166.111.7.244:10000: *********  
+    beeline> !connect jdbc:hive2://166.***.*.244:10000  
+    Connecting to jdbc:hive2://166.***.*.244:10000  
+    Enter username for jdbc:hive2://166.***.*.244:10000: cassandra  
+    Enter password for jdbc:hive2://166.***.*.244:10000: *********  
     log4j:WARN No appenders could be found for logger (org.apache.hive.jdbc.Utils).  
     log4j:WARN Please initialize the log4j system properly.  
     log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.  
@@ -187,10 +187,10 @@ scp给两外两台机器
     Driver: Hive JDBC (version 1.2.1.spark2)  
     Transaction isolation: TRANSACTION_REPEATABLE_READ  
 
-    jdbc:hive2://166.111.7.244:10000> create database mykeyspace;  
-    jdbc:hive2://166.111.7.244:10000> use mykeyspace;  
-    jdbc:hive2://166.111.7.244:10000> CREATE TABLE rocket_table USING org.apache.spark.sql.cassandra OPTIONS (cluster 'Test Cluster', keyspace  'mykeyspace', table 'rocket_table');  
-    jdbc:hive2://166.111.7.244:10000> select * from rocket_table;  
+    jdbc:hive2://166.***.*.244:10000> create database mykeyspace;  
+    jdbc:hive2://166.***.*.244:10000> use mykeyspace;  
+    jdbc:hive2://166.***.*.244:10000> CREATE TABLE rocket_table USING org.apache.spark.sql.cassandra OPTIONS (cluster 'Test Cluster', keyspace  'mykeyspace', table 'rocket_table');  
+    jdbc:hive2://166.***.*.244:10000> select * from rocket_table;  
 
 SQL server 通过ODBC连接cassandra+spark集群。
 参照 http://wiki.servicenow.com/index.php?title=Using_ODBC_Driver_in_SQL_Server#gsc.tab=0
